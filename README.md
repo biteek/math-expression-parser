@@ -1,25 +1,25 @@
-# Interpreter Zaawansowanego Kalkulatora (Ewaluator Wyrażeń)
+# Advanced Calculator Interpreter (Expression Evaluator)
 
-## Autor
-* **Bartłomiej Cichy**
+## Author
+- **Bartłomiej Cichy**
 
-## Opis projektu
-Projekt realizuje autorski parser oraz interpreter zaawansowanych wyrażeń matematycznych. Program przekształca kod wejściowy na AST (Abstract Syntax Tree), uwzględniając prawidłowy priorytet operatorów oraz ich łączność (lewostronną dla podstawowych działań, prawostronną dla potęgowania). 
+## Project Description
+This project implements a custom parser and interpreter for advanced mathematical expressions. The program transforms the input code into an AST (Abstract Syntax Tree), taking into account correct operator precedence and associativity (left-associative for basic operations, right-associative for exponentiation). 
 
-Narzędzie posiada wbudowaną pamięć, co pozwala na definiowanie zmiennych i ponowne ich wykorzystywanie w kolejnych wyrażeniach. Program został zabezpieczony przed krytycznymi błędami – zamiast rzucać surowe wyjątki z poziomu interpretera Pythona (np. `IndexError`, `ZeroDivisionError`), przechwytuje błędy składniowe, semantyczne oraz matematyczne, wyświetlając użytkownikowi czytelne komunikaty.
+The tool features built-in memory, allowing users to define variables and reuse them in subsequent expressions. The program is secured against critical errors – instead of throwing raw exceptions from the Python interpreter level (e.g., `IndexError`, `ZeroDivisionError`), it catches syntax, semantic, and mathematical errors, displaying readable messages to the user.
 
-## Formalna Gramatyka i Tokeny
-Język został zdefiniowany za pomocą gramatyki bezkontekstowej (**Typ 2 w hierarchii Chomsky'ego**). Do wygenerowania parsera zastosowano analizator składniowy typu LALR.
+## Formal Grammar and Tokens
+The language is defined using a context-free grammar (**Type 2 in the Chomsky hierarchy**). An LALR parser was used for syntax analysis.
 
-### Tokeny (Elementy Leksykalne)
-* `NUMBER`: Ciąg cyfr, opcjonalnie zawierający kropkę dziesiętną.
-* `CNAME`: Identyfikator zmiennej rozpoczynający się od litery, zawierający litery, cyfry lub znaki podkreślenia.
-* Operatory i znaki specjalne: `=`, `+`, `-`, `*`, `/`, `^`, `(`, `)`.
-* Białe znaki (`WS`): Ignorowane przez lekser.
+### Tokens (Lexical Elements)
+- `NUMBER`: A sequence of digits, optionally containing a decimal point.
+- `CNAME`: A variable identifier starting with a letter, containing letters, digits, or underscores.
+- Operators and special characters: `=`, `+`, `-`, `*`, `/`, `^`, `(`, `)`.
+- Whitespace (`WS`): Ignored by the lexer.
 
-### Definicja Gramatyki
-* **Symbol startowy**: `program`
-* **Nieterminale**: `program`, `statement`, `assignment`, `expr`, `term`, `pow`, `factor`
+### Grammar Definition
+- **Start symbol**: `program`
+- **Non-terminals**: `program`, `statement`, `assignment`, `expr`, `term`, `pow`, `factor`
 
 ```text
 ?start:program
@@ -47,56 +47,56 @@ assignment: CNAME "=" expr
         | "(" expr ")"
 ```
 
-## Instrukcja uruchomienia i przykłady użycia
+## Setup and Usage Examples
 
-1. Upewnij się, że posiadasz zainstalowanego Pythona (wersja 3).
-2. Zainstaluj bibliotekę 'lark'.
+1. Make sure you have Python installed (version 3).
+2. Install the 'lark' library.
 ```bash
 pip install lark
 ```
-3. Uruchom główny skrypt demonstracyjny:
+3. Run the main demo script:
 ```bash
 python main.py
 ```
 
-### Przykład 1: Poprawne budowanie AST i priorytet operatorów
+### Example 1: Correct AST construction and operator precedence
 
-**Wejście:**
+**Input:**
 ```text
 x = 5 + 3 * 2
 ```
-**Wynik interpretacji:** `11.0`
+**Result:** `11.0`
 
-**Opis działania:** Program poprawnie interpretuje priorytet operatorów. Drzewo AST buduje węzeł `Assignment` dla zmiennej `x`, gdzie prawym dzieckiem jest operacja `BinOp(+)`. Dziećmi dodawania są `Number(5)` oraz `BinOp(*)`, które z kolei zawiera wartości `Number(3)` i `Number(2)`.
+**Description:** The program correctly interprets operator precedence. The AST builds an `Assignment` node for the variable `x`, where the right child is a `BinOp(+)` operation. The children of the addition are `Number(5)` and `BinOp(*)`, which in turn contains the values `Number(3)` and `Number(2)`.
 
-### Przykład 2: Wykorzystanie zmiennych w pamięci
+### Example 2: Using variables in memory
 
-**Wejście:**
+**Input:**
 ```text
 y = x ^ 2
 ```
-**Wynik interpretacji:** `121.0`
+**Result:** `121.0`
 
-**Opis działania:** Program odwołuje się do środowiska (`env`), pobiera wartość przypisaną wcześniej do zmiennej `x` (11.0) i wykonuje operację potęgowania z zachowaniem łączności prawostronnej.
+**Description:** The program queries the environment (`env`), retrieves the value previously assigned to the variable `x` (11.0), and performs the exponentiation operation while maintaining right-associativity.
 
-### Przykład 3: Odporność na błędy (Error Handling)
+### Example 3: Error Handling
 
-Zgodnie z wymaganiami program nie kończy się rzuceniem surowego wyjątku, lecz poprawnie go przechwytuje.
+As required, the program does not crash by throwing a raw exception, but correctly catches it (error messages in polish language).
 
-**Wejście 1 (błąd składniowy):**
+**Input 1 (syntax error):**
 ```text
 z = 10 + * 5
 ```
-**Wynik programu:**
+**Program output:**
 ```text
 Syntax error: nieoczekiwany token w linii 1, kolumnie 10.
 ```
 
-**Wejście 2 (błąd matematyczny):**
+**Input 2 (math error):**
 ```text
 10 / 0
 ```
-**Wynik programu:**
+**Program output:**
 ```text
 Błąd. Dzielenie przez zero!
 ```
